@@ -13,11 +13,11 @@ import {SIG_VALIDATION_FAILED, SIG_VALIDATION_SUCCESS} from "lib/account-abstrac
 import {IEntryPoint} from "lib/account-abstraction/contracts/interfaces/IEntryPoint.sol";
 
 contract MinimalAccount is IAccount, Ownable {
-    address private immutable i_entryPoint;
+    IEntryPoint private immutable i_entryPoint;
 
     // uint256 ourNonce = 0; // to track nonce but actual nonce uniqueness is managed by entrypoint itself
 
-    constructor(address entryPoint) Ownable(msg.sender) {
+    constructor(IEntryPoint entryPoint) Ownable(msg.sender) {
         i_entryPoint = entryPoint;
     } // You can also make this contract ownership transferable to different wallets.
 
