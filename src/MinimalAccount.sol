@@ -58,4 +58,8 @@ contract MinimalAccount is IAccount, Ownable {
             (success);
         }
     }
+
+    function getEntryPoint() external view returns (address) {
+        return address(i_entryPoint);
+    }
 }
