@@ -13,7 +13,16 @@ import {SIG_VALIDATION_FAILED, SIG_VALIDATION_SUCCESS} from "lib/account-abstrac
 import {IEntryPoint} from "lib/account-abstraction/contracts/interfaces/IEntryPoint.sol";
 
 contract MinimalAccount is IAccount, Ownable {
+    error MinimalAccount__NotFromEntryPoint();
+
     IEntryPoint private immutable i_entryPoint;
+
+    modifier requireFromEntryPoint() {
+        if (msg.sender != address(i_entryPoint)) {
+            revert MinimalAccount__NotFromEntryPoint();
+        }
+        _;
+    }
 
     // uint256 ourNonce = 0; // to track nonce but actual nonce uniqueness is managed by entrypoint itself
 
@@ -31,6 +40,7 @@ contract MinimalAccount is IAccount, Ownable {
     // A function that will be called in Entry Point
     function validateUserOp(PackedUserOperation calldata userOp, bytes32 userOpHash, uint256 missingAccountFunds)
         external
+        requireFromEntryPoint
         returns (uint256 validationData)
     {
         validationData = _validateSignature(userOp, userOpHash);
