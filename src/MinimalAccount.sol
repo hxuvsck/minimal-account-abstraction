@@ -36,6 +36,12 @@ contract MinimalAccount is IAccount, Ownable {
     // which it gets ops tuple and packedOperations
     // https://github.com/eth-infinitism/account-abstraction using the interfaces of them rather than writing our ownselves.
 
+    /*//////////////////////////////////////////////////////////////
+                           EXTERNAL FUNCTIONS
+    //////////////////////////////////////////////////////////////*/
+
+    function execute() external {}
+
     // A signature is valid, if it's the contract (Minimal Account) owner
     // A function that will be called in Entry Point
     function validateUserOp(PackedUserOperation calldata userOp, bytes32 userOpHash, uint256 missingAccountFunds)
@@ -69,6 +75,13 @@ contract MinimalAccount is IAccount, Ownable {
         }
     }
 
+    /*//////////////////////////////////////////////////////////////
+                           INTERNAL FUNCTIONS
+    //////////////////////////////////////////////////////////////*/
+
+    /*//////////////////////////////////////////////////////////////
+                            GETTER FUNCTIONS
+    //////////////////////////////////////////////////////////////*/
     function getEntryPoint() external view returns (address) {
         return address(i_entryPoint);
     }
