@@ -14,12 +14,20 @@ import {IEntryPoint} from "lib/account-abstraction/contracts/interfaces/IEntryPo
 
 contract MinimalAccount is IAccount, Ownable {
     error MinimalAccount__NotFromEntryPoint();
+    error MinimalAccount__NotFromEntryPointOrOwner();
 
     IEntryPoint private immutable i_entryPoint;
 
     modifier requireFromEntryPoint() {
         if (msg.sender != address(i_entryPoint)) {
             revert MinimalAccount__NotFromEntryPoint();
+        }
+        _;
+    }
+
+    modifier requireFromEntryPointOwner() {
+        if (msg.sender != address(i_entryPoint) && msg.sender != owner()) {
+            revert MinimalAccount__NotFromEntryPointOrOwner();
         }
         _;
     }
@@ -40,7 +48,13 @@ contract MinimalAccount is IAccount, Ownable {
                            EXTERNAL FUNCTIONS
     //////////////////////////////////////////////////////////////*/
 
-    function execute() external {}
+    /**
+     *
+     * @param dest
+     * @param value
+     * @param functionData
+     */
+    function execute(address dest, uint256 value, bytes calldata functionData) external requireFromEntryPoint {}
 
     // A signature is valid, if it's the contract (Minimal Account) owner
     // A function that will be called in Entry Point
