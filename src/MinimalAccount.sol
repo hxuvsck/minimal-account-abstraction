@@ -13,11 +13,18 @@ import {SIG_VALIDATION_FAILED, SIG_VALIDATION_SUCCESS} from "lib/account-abstrac
 import {IEntryPoint} from "lib/account-abstraction/contracts/interfaces/IEntryPoint.sol";
 
 contract MinimalAccount is IAccount, Ownable {
+    // some point, the EntryPoint contract will call this contract
+    // https://eips.ethereum.org/EIPS/eip-4337
+    // https://etherscan.deth.net/address/0x0576a174D229E3cFA37253523E645A78A0C91B57 for interaction with EIP-4337
+    // which it gets ops tuple and packedOperations
+    // https://github.com/eth-infinitism/account-abstraction using the interfaces of them rather than writing our ownselves.
+
     /*//////////////////////////////////////////////////////////////
                                  ERRORS
     //////////////////////////////////////////////////////////////*/
     error MinimalAccount__NotFromEntryPoint();
     error MinimalAccount__NotFromEntryPointOrOwner();
+    error MinimalAccount__CallFailed(bytes);
 
     /*//////////////////////////////////////////////////////////////
                             STATE VARIABLES
@@ -50,24 +57,18 @@ contract MinimalAccount is IAccount, Ownable {
         i_entryPoint = entryPoint;
     } // You can also make this contract ownership transferable to different wallets.
 
-    // some point, the EntryPoint contract will call this contract
-    // https://eips.ethereum.org/EIPS/eip-4337
-    // https://etherscan.deth.net/address/0x0576a174D229E3cFA37253523E645A78A0C91B57 for interaction with EIP-4337
-    // which it gets ops tuple and packedOperations
-    // https://github.com/eth-infinitism/account-abstraction using the interfaces of them rather than writing our ownselves.
+    // receive() should be here in case for this contract, we don't have a paymaster. So whenever alt mempool sends a tx, we need to fund the contract
 
     /*//////////////////////////////////////////////////////////////
                            EXTERNAL FUNCTIONS
     //////////////////////////////////////////////////////////////*/
 
-    /**
-     * Natspec
-     *
-     * @param dest
-     * @param value
-     * @param functionData
-     */
-    function execute(address dest, uint256 value, bytes calldata functionData) external requireFromEntryPoint {}
+    function execute(address dest, uint256 value, bytes calldata functionData) external requireFromEntryPoint {
+        (bool success, bytes memory result) = dest.call{value: value}(functionData);
+        if (!success) {
+            revert MinimalAccount__CallFailed(result);
+        }
+    }
 
     // A signature is valid, if it's the contract (Minimal Account) owner
     // A function that will be called in Entry Point
