@@ -12,6 +12,13 @@ contract SendPackedUserOp {
     function generatedSignedUserOperation() public return(PackedUserOperation memory) {
         // 1. Generate unsigned data
         // 2. Sign it, return it
-        
+
+    }
+
+    function _generateUnsignedUserOperation(bytes memory callData. address sender) internal pure returns(PackedUserOperation memory) {
+        return PackedUserOperation{
+            address sender: ;
+
+        }
     }
 }
