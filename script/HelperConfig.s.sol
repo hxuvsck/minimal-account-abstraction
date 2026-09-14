@@ -15,7 +15,8 @@ contract HelperConfig is Script {
     uint256 constant ETH_SEPOLIA_CHAIN_ID = 11155111;
     uint256 constant ZKSYNC_SEPOLIA_CHAIN_ID = 300;
     uint256 constant LOCAL_CHAIN_ID = 31337;
-    address constant BURNER_WALLET = 0x816Be982DF2E96928b78780e23BA84c5150A1bbB;
+    address constant BURNER_WALLET = 0x643315C9Be056cDEA171F4e7b2222a4ddaB9F88D; // hardcoded if from course
+    address constant FOUNDRY_DEFAULT_WALLET = 0x1804c8AB1F12E6bbf3894d4083f33e07309d1f38; // found from Base.sol
 
     NetworkConfig public localNetworkConfig;
     mapping(uint256 chainId => NetworkConfig) public networkConfigs;
@@ -31,7 +32,7 @@ contract HelperConfig is Script {
     function getConfigByChainId(uint256 chainId) public returns (NetworkConfig memory) {
         if (chainId == LOCAL_CHAIN_ID) {
             return getOrCreateAnvilEthConfig();
-        } else if (networkConfigs[chaindId].account != address(0)) {
+        } else if (networkConfigs[chainId].account != address(0)) {
             return networkConfigs[chainId];
         } else {
             revert HelperConfig__InvalidChainId();
@@ -39,16 +40,20 @@ contract HelperConfig is Script {
     }
 
     function getEthSepoliaConfig() public pure returns (NetworkConfig memory) {
-        return NetworkConfig({entryPoint: , account: BURNER_WALLET});
+        return NetworkConfig({entryPoint: 0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789, account: BURNER_WALLET});
     }
 
     function getZkSyncSepoliaConfig() public pure returns (NetworkConfig memory) {
         return NetworkConfig({entryPoint: address(0), account: BURNER_WALLET}); // zksync is native
     }
 
-    function getOrCreateAnvilEthConfig() public pure returns (NetworkConfig memory) {
+    function getOrCreateAnvilEthConfig() public view returns (NetworkConfig memory) {
         if (localNetworkConfig.account != address(0)) {
             return localNetworkConfig;
-        } // or else we will deploy mock entrypoint contract
+        }
+
+        // or else we will deploy mock entrypoint contract
+
+        return NetworkConfig({entryPoint: address(0), account: FOUNDRY_DEFAULT_WALLET});
     }
 }
