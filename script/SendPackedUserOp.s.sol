@@ -29,7 +29,16 @@ contract SendPackedUserOp is Script {
         bytes32 digest = userOpHash.toEthSignedMessageHash(); // correctly formatted hash using MessageHashUtils
 
         // 3. Sign it (digested hash) here
-        (uint8 v, bytes32 r, bytes32 s) = vm.sign(config.account, digest); // if you insert your private key, it will be risk. So foundry as using config.account if unlocked priv key.
+        uint8 v;
+        bytes32 r;
+        bytes32 s;
+        uint256 ANVIL_DEFAULT_KEY = 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80;
+        if (block.chainid == 31337) {
+            (v, r, s) = vm.sign(ANVIL_DEFAULT_KEY, digest);
+        } else {
+            (v, r, s) = vm.sign(config.account, digest);
+        }
+        // (uint8 v, bytes32 r, bytes32 s) = vm.sign(config.account, digest); // if you insert your private key, it will be risk. So foundry as using config.account if unlocked priv key.
         //combining this value together, we will create the bottom of struct PackedUserOperation's bytes signature
         userOp.signature = abi.encodePacked(r, s, v); // check the order as not v,r,s but r,s,v...
         return userOp;

@@ -16,7 +16,7 @@ contract DeployMinimal is Script {
 
         vm.startBroadcast(config.account);
         MinimalAccount minimalAccount = new MinimalAccount(IEntryPoint(config.entryPoint));
-        minimalAccount.transferOwnership(msg.sender);
+        minimalAccount.transferOwnership(config.account);
         vm.stopBroadcast();
         return (helperConfig, minimalAccount);
     } // in minimal account, all we need is entrypoint so doing it in helperconfig
